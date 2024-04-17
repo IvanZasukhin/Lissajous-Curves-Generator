@@ -75,6 +75,9 @@ class MainWindow(QMainWindow):
         try:
             value = eval(self.amplitudeX_lineEdit.text())
             value = int(float(value) * 100)
+            if self.amplitudeX_slider.minimum() > value or value > self.amplitudeX_slider.maximum():
+                self.amplitudeX_slider.setMaximum(value + 50)
+                self.amplitudeX_slider.setMinimum(value - 50)
             self.amplitudeX_slider.setValue(value)
             self.button_render_clicked()
         except ValueError:
@@ -89,6 +92,9 @@ class MainWindow(QMainWindow):
         try:
             value = eval(self.amplitudeY_lineEdit.text())
             value = int(float(value) * 100)
+            if self.amplitudeY_slider.minimum() > value or value > self.amplitudeY_slider.maximum():
+                self.amplitudeY_slider.setMaximum(value + 50)
+                self.amplitudeY_slider.setMinimum(value - 50)
             self.amplitudeY_slider.setValue(value)
             self.button_render_clicked()
         except ValueError:
@@ -147,7 +153,8 @@ class MainWindow(QMainWindow):
     def button_render_clicked(self):
         self.insert_ax()
 
-        self.t = np.linspace(-step_len_pi, step_len_pi + 1, endpoint=True)
+        self.t = np.linspace(-step_len_pi, step_len_pi + 1, endpoint=True, num=(
+                    int((self.frequencyX_slider.value() / 100) + (self.frequencyY_slider.value() / 100) * 200)))
         self.x = (self.amplitudeX_slider.value() / 100) * np.sin((self.frequencyX_slider.value() / 100) * self.t)
         self.y = (self.amplitudeY_slider.value() / 100) * np.sin((self.frequencyY_slider.value() / 100) * self.t)
 
