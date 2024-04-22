@@ -9,10 +9,11 @@ from PyQt5 import QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
+
 template = """<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <widget class="QMainWindow" name="Симулятор фигур Лиссажу">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,7 +23,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Симулятор фигур Лиссажу</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -472,7 +473,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
           <item>
            <widget class="QLabel" name="label_phaseX">
             <property name="text">
-             <string>Разность фазX(φx)</string>
+             <string>Начальная фаза по X(φx)</string>
             </property>
            </widget>
           </item>
@@ -498,7 +499,7 @@ template = """<?xml version="1.0" encoding="UTF-8"?>
           <item>
            <widget class="QLabel" name="label_phaseY">
             <property name="text">
-             <string>Разность фазY(φy)</string>
+             <string>Начальная фаза по Y(φy)</string>
             </property>
            </widget>
           </item>
@@ -744,6 +745,8 @@ class MainWindow(QMainWindow):
         self.frequencyX_lineEdit.setText(str(init_frequencyX))
         self.amplitudeY_lineEdit.setText(str(init_amplitudeY))
         self.amplitudeX_lineEdit.setText(str(init_amplitudeX))
+        self.phaseY_lineEdit.setText(str(0))
+        self.phaseX_lineEdit.setText(str("pi"))
 
         self.frequencyY_lineEdit_changeValue()
         self.frequencyX_lineEdit_changeValue()
@@ -755,7 +758,7 @@ class MainWindow(QMainWindow):
     def phaseY_lineEdit_changeValue(self):
         try:
             if "pi" not in str(self.phaseY_lineEdit.text()):
-                self.phaseY_lineEdit.text = str(eval(self.phaseY_lineEdit.text().replace(",", ".")))
+                self.phaseY_lineEdit.setText(str(eval(self.phaseY_lineEdit.text().replace(",", "."))))
         except ValueError:
             pass
         except SyntaxError:
@@ -765,7 +768,7 @@ class MainWindow(QMainWindow):
     def phaseX_lineEdit_changeValue(self):
         try:
             if "pi" not in str(self.phaseX_lineEdit.text()):
-                self.phaseX_lineEdit.text = str(eval(str(self.phaseX_lineEdit.text).replace(",", ".")))
+                self.phaseX_lineEdit.setText(str(eval(str(self.phaseX_lineEdit.text).replace(",", "."))))
         except ValueError:
             pass
         except SyntaxError:
