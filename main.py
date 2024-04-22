@@ -1,4 +1,6 @@
 import sys
+
+import numpy
 import numpy as np
 import matplotlib
 import matplotlib.pylab as plt
@@ -46,6 +48,9 @@ class MainWindow(QMainWindow):
         self.frequencyY_slider.valueChanged.connect(self.frequencyY_changeValue)
         self.frequencyY_lineEdit.editingFinished.connect(self.frequencyY_lineEdit_changeValue)
 
+        self.phaseY_lineEdit.editingFinished.connect(self.phaseY_lineEdit_changeValue)
+        self.phaseX_lineEdit.editingFinished.connect(self.phaseX_lineEdit_changeValue)
+
         self.button_reset.clicked.connect(self.button_reset_clicked)
         self.button_render.clicked.connect(self.button_render_clicked)
 
@@ -73,68 +78,68 @@ class MainWindow(QMainWindow):
 
     def amplitudeX_lineEdit_changeValue(self):
         try:
-            value = eval(self.amplitudeX_lineEdit.text())
+            value = eval(self.amplitudeX_lineEdit.text().replace(",", "."))
             value = int(float(value) * 100)
             if self.amplitudeX_slider.minimum() > value or value > self.amplitudeX_slider.maximum():
                 self.amplitudeX_slider.setMaximum(value + 50)
                 self.amplitudeX_slider.setMinimum(value - 50)
             self.amplitudeX_slider.setValue(value)
-            self.button_render_clicked()
         except ValueError:
             pass
         except SyntaxError:
             pass
+        self.button_render_clicked()
 
     def amplitudeY_changeValue(self, value):
         self.amplitudeY_lineEdit.setText(str(value / 100))
 
     def amplitudeY_lineEdit_changeValue(self):
         try:
-            value = eval(self.amplitudeY_lineEdit.text())
+            value = eval(self.amplitudeY_lineEdit.text().replace(",", "."))
             value = int(float(value) * 100)
             if self.amplitudeY_slider.minimum() > value or value > self.amplitudeY_slider.maximum():
                 self.amplitudeY_slider.setMaximum(value + 50)
                 self.amplitudeY_slider.setMinimum(value - 50)
             self.amplitudeY_slider.setValue(value)
-            self.button_render_clicked()
         except ValueError:
             pass
         except SyntaxError:
             pass
+        self.button_render_clicked()
 
     def frequencyX_changeValue(self, value):
         self.frequencyX_lineEdit.setText(str(value / 100))
 
     def frequencyX_lineEdit_changeValue(self):
         try:
-            value = eval(self.frequencyX_lineEdit.text())
+            value = eval(self.frequencyX_lineEdit.text().replace(",", "."))
             value = int(float(value) * 100)
             if self.frequencyX_slider.minimum() > value or value > self.frequencyX_slider.maximum():
                 self.frequencyX_slider.setMaximum(value + 50)
                 self.frequencyX_slider.setMinimum(value - 50)
             self.frequencyX_slider.setValue(value)
-            self.button_render_clicked()
         except ValueError:
             pass
         except SyntaxError:
             pass
+        self.button_render_clicked()
 
     def frequencyY_changeValue(self, value):
         self.frequencyY_lineEdit.setText(str(value / 100))
 
     def frequencyY_lineEdit_changeValue(self):
         try:
-            value = eval(self.frequencyY_lineEdit.text())
+            value = eval(self.frequencyY_lineEdit.text().replace(",", "."))
             value = int(float(value) * 100)
             if self.frequencyY_slider.minimum() > value or value > self.frequencyY_slider.maximum():
                 self.frequencyY_slider.setMaximum(value + 50)
                 self.frequencyY_slider.setMinimum(value - 50)
             self.frequencyY_slider.setValue(value)
-            self.button_render_clicked()
         except ValueError:
             pass
         except SyntaxError:
             pass
+        self.button_render_clicked()
 
     def button_reset_clicked(self):
 
@@ -150,21 +155,58 @@ class MainWindow(QMainWindow):
 
         self.button_render_clicked()
 
+    def phaseY_lineEdit_changeValue(self):
+        try:
+            if "pi" not in str(self.phaseY_lineEdit.text()):
+                self.phaseY_lineEdit.text = str(eval(self.phaseY_lineEdit.text().replace(",", ".")))
+        except ValueError:
+            pass
+        except SyntaxError:
+            pass
+        self.button_render_clicked()
+
+    def phaseX_lineEdit_changeValue(self):
+        try:
+            if "pi" not in str(self.phaseX_lineEdit.text()):
+                self.phaseX_lineEdit.text = str(eval(str(self.phaseX_lineEdit.text).replace(",", ".")))
+        except ValueError:
+            pass
+        except SyntaxError:
+            pass
+        self.button_render_clicked()
+
     def button_render_clicked(self):
         self.insert_ax()
+        try:
+            phaseX = float(eval(
+                str(self.phaseX_lineEdit.text()).replace(",",
+                                                         ".")) if "pi" not in str(
+                self.phaseX_lineEdit.text()) else float(
+                eval(
+                    str(self.phaseX_lineEdit.text()).replace(",", ".").replace("pi", str(numpy.pi)))))
+            phaseY = float(eval(
+                str(self.phaseY_lineEdit.text()).replace(",",
+                                                         ".")) if "pi" not in str(
+                self.phaseY_lineEdit.text()) else float(
+                eval(
+                    str(self.phaseY_lineEdit.text()).replace(",", ".").replace("pi", str(numpy.pi)))))
+            self.t = np.linspace(-step_len_pi, step_len_pi + 1, endpoint=True, num=(
+                int((self.frequencyX_slider.value() / 100) + (self.frequencyY_slider.value() / 100) * 200)))
+            self.x = (self.amplitudeX_slider.value() / 100) * np.sin(
+                (self.frequencyX_slider.value() / 100) * self.t + phaseX)
+            self.y = (self.amplitudeY_slider.value() / 100) * np.cos(
+                (self.frequencyY_slider.value() / 100) * self.t + phaseY)
+            line, = self.ax.plot(self.x, self.y, lw=2)
 
-        self.t = np.linspace(-step_len_pi, step_len_pi + 1, endpoint=True, num=(
-                    int((self.frequencyX_slider.value() / 100) + (self.frequencyY_slider.value() / 100) * 200)))
-        self.x = (self.amplitudeX_slider.value() / 100) * np.sin((self.frequencyX_slider.value() / 100) * self.t)
-        self.y = (self.amplitudeY_slider.value() / 100) * np.sin((self.frequencyY_slider.value() / 100) * self.t)
+            m = 1 + 0.2
+            self.ax.set_ylim((-m, m))
+            self.ax.set_xlim((-m, m))
 
-        line, = self.ax.plot(self.x, self.y, lw=2)
-
-        m = 1 + 0.2
-        self.ax.set_ylim((-m, m))
-        self.ax.set_xlim((-m, m))
-
-        self.graphic_program.draw()
+            self.graphic_program.draw()
+        except ValueError:
+            pass
+        except SyntaxError:
+            pass
 
 
 def except_hook(cls, exception, traceback):
